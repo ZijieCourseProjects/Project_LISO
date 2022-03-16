@@ -18,9 +18,11 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include "../include/process.h"
+#include "error_message.h"
 
 #define ECHO_PORT 9999
-#define BUF_SIZE 4096
+#define BUF_SIZE 8192
 
 int close_socket(int sock)
 {
@@ -85,14 +87,39 @@ int main(int argc, char* argv[])
 
         while((readret = recv(client_sock, buf, BUF_SIZE, 0)) >= 1)
         {
-            if (send(client_sock, buf, readret, 0) != readret)
+          Request *requst = parse(buf,BUF_SIZE,0);
+          if(requst == NULL){
+            if (send(client_sock, ERROR400, strlen(ERROR400), 0) != strlen(ERROR400))
             {
-                close_socket(client_sock);
-                close_socket(sock);
-                fprintf(stderr, "Error sending to client.\n");
-                return EXIT_FAILURE;
+              close_socket(client_sock);
+              close_socket(sock);
+              fprintf(stderr, "Error sending to client.\n");
+              return EXIT_FAILURE;
             }
             memset(buf, 0, BUF_SIZE);
+            continue;
+          }
+          //Request is GET/POST/HEAD then echo
+          if(process(requst) == 1){
+            if (send(client_sock, buf, readret, 0) != readret)
+            {
+              close_socket(client_sock);
+              close_socket(sock);
+              fprintf(stderr, "Error sending to client.\n");
+              return EXIT_FAILURE;
+            }
+          }else{
+            if (send(client_sock, ERROR501, strlen(ERROR501), 0) != strlen(ERROR501))
+            {
+              close_socket(client_sock);
+              close_socket(sock);
+              fprintf(stderr, "Error sending to client.\n");
+              return EXIT_FAILURE;
+            }
+          }
+          free(requst->headers);
+          free(requst);
+          memset(buf, 0, BUF_SIZE);
         } 
 
         if (readret == -1)

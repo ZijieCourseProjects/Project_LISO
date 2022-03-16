@@ -1,0 +1,11 @@
+//
+// Created by Eric Zhao on 16/3/2022.
+//
+
+#ifndef INTERNETPROJECT_INCLUDE_ERROR_MESSAGE_H_
+#define INTERNETPROJECT_INCLUDE_ERROR_MESSAGE_H_
+
+#define ERROR400 "HTTP/1.1 400 Bad request\r\n\r\n"
+#define ERROR501 "HTTP/1.1 501 Not Implemented\r\n\r\n"
+
+#endif //INTERNETPROJECT_INCLUDE_ERROR_MESSAGE_H_
