@@ -197,6 +197,9 @@ t_ws {
 	snprintf($$, 8192, "%s", $1);
 };
 
+request_headers:
+|request_headers request_header;
+
 request_line: token t_sp text t_sp text t_crlf {
 	YPRINTF("request_Line:\n%s\n%s\n%s\n",$1, $3,$5);
     strcpy(parsing_request->http_method, $1);
@@ -218,7 +221,7 @@ request_header: token ows t_colon ows text ows t_crlf {
  * All the best!
  *
  */
-request: request_line request_header t_crlf{
+request: request_line request_headers t_crlf{
 	YPRINTF("parsing_request: Matched Success.\n");
 	return SUCCESS;
 };
