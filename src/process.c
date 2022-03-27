@@ -7,12 +7,12 @@
 #include "unistd.h"
 #include "sys/stat.h"
 #include "../include/error_message.h"
+#include "../include/logger.h"
+#include "errno.h"
 
 int process_get(Request * ptr_request,char *response);
 int process_post(Request * ptr_request,char *response);
 int process_head(Request * ptr_request, char *response);
-void build_status_line(char* buf,char* status_with_reason);
-void build_headers(char* buf,struct Response_headers * headers);
 
 int process(Request* ptr_request,char *response){
 
@@ -20,6 +20,7 @@ int process(Request* ptr_request,char *response){
   if(ptr_request == NULL){
     build_status_line(response,RESPONSE_400);
     build_headers(response,NULL);
+    log_access(ptr_request,400, strlen(response));
     return strlen(response);
   }
 
@@ -29,6 +30,7 @@ int process(Request* ptr_request,char *response){
   if(strcmp(ptr_request->http_version,HTTP_VERSION)!=0){
     build_status_line(response,RESPONSE_505);
     build_headers(response, NULL);
+    log_access(ptr_request,505, strlen(response));
     return strlen(response);
   }
 
@@ -43,12 +45,14 @@ int process(Request* ptr_request,char *response){
   //501 NOT IMPLEMENT
   build_status_line(response,RESPONSE_501);
   build_headers(response,NULL);
+  log_access(ptr_request,501, strlen(response));
   return strlen(response);
 }
 
 int process_get(Request* ptr_request,char* response){
   char path[1024];
   memset(path,0,1024);
+
   getcwd(path,1024);
   strcat(path,"/static_site");
   if(strcmp(ptr_request->http_uri,"/") == 0){
@@ -57,11 +61,13 @@ int process_get(Request* ptr_request,char* response){
     strcat(path,ptr_request->http_uri);
   }
 
+  errno = 0;
   FILE *fp = fopen(path,"rb");
 
   if(fp == NULL){
     build_status_line(response,RESPONSE_404);
     build_headers(response, NULL);
+    log_error("error", strerror(errno));
     return strlen(response);
   }
 
@@ -95,6 +101,7 @@ int process_get(Request* ptr_request,char* response){
   memcpy(response+strlen(response),buffer, lSize);
   fclose(fp);
   free(buffer);
+  log_access(ptr_request,200, strlen(response));
   return strlen(response);
 }
 int process_post(Request* ptr_request,char* response){
@@ -103,18 +110,25 @@ int process_post(Request* ptr_request,char* response){
 int process_head(Request* ptr_request, char* response){
   char path[1024];
   memset(path,0,1024);
+
   getcwd(path,1024);
-  strcat(path,"/static_site/");
+  strcat(path,"/static_site");
   if(strcmp(ptr_request->http_uri,"/") == 0){
-    strcat(path,"index.html");
+    strcat(path,"/index.html");
+  }else{
+    strcat(path,ptr_request->http_uri);
   }
 
   FILE *fp = fopen(path,"rb");
+
   if(fp == NULL){
     build_status_line(response,RESPONSE_404);
     build_headers(response, NULL);
+    log_error("error", strerror(errno));
     return strlen(response);
   }
+
+  fclose(fp);
 
   build_status_line(response,RESPONSE_200);
 
@@ -128,6 +142,8 @@ int process_head(Request* ptr_request, char* response){
 
   build_headers(response, ptr_response_headers);
 
+  free(ptr_response_headers);
+  log_access(ptr_request,200, strlen(response));
   return strlen(response);
 }
 

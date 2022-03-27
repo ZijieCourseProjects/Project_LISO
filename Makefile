@@ -3,7 +3,7 @@ OBJ_DIR := obj
 # all src files
 SRC := $(wildcard $(SRC_DIR)/*.c)
 # all objects
-OBJ := $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o $(OBJ_DIR)/process.o $(OBJ_DIR)/wrapped_socket.o
+OBJ := $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o $(OBJ_DIR)/process.o $(OBJ_DIR)/wrapped_socket.o $(OBJ_DIR)/logger.o
 # all binaries
 BIN := example liso_server liso_client
 # C compiler

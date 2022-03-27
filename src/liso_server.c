@@ -21,10 +21,12 @@
 #include "../include/process.h"
 #include "../include/wrapped_socket.h"
 #include "../include/error_message.h"
+#include "../include/logger.h"
 
 #define BUF_SIZE 8192
 
 int main(int argc, char *argv[]) {
+  logger_init();
   int readret;
   char buf[BUF_SIZE];
 

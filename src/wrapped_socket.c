@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include "stdlib.h"
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define ECHO_PORT 9999
 
@@ -94,5 +95,9 @@ int close_client() {
 
 void socket_destroy(){
   close_socket(sock);
+}
+
+char *get_client_ip(){
+  return inet_ntoa(cli_addr.sin_addr);
 }
 
