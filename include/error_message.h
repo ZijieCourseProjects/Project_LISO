@@ -5,7 +5,12 @@
 #ifndef INTERNETPROJECT_INCLUDE_ERROR_MESSAGE_H_
 #define INTERNETPROJECT_INCLUDE_ERROR_MESSAGE_H_
 
-#define ERROR400 "HTTP/1.1 400 Bad request\r\n\r\n"
-#define ERROR501 "HTTP/1.1 501 Not Implemented\r\n\r\n"
+#define RESPONSE_400 "400 Bad request"
+#define RESPONSE_200 "200 OK"
+#define RESPONSE_404 "404 Not Found"
+#define RESPONSE_501 "501 Not Implemented"
+#define RESPONSE_505 "505 HTTP Version not supported"
+#define HTTP_VERSION "HTTP/1.1"
+#define CRLF "\r\n"
 
 #endif //INTERNETPROJECT_INCLUDE_ERROR_MESSAGE_H_
