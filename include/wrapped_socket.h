@@ -6,12 +6,13 @@
 #define INTERNETPROJECT_INCLUDE_WRAPPED_SOCKET_H_
 
 int sock_init();
-int send_byte(char *buffer, int length);
+int send_byte(char *buffer, int length, int sockfd);
 int socket_accept();
 int socket_destroy();
 int close_socket(int _sock);
-int close_client();
-int socket_receive(char *buff,int buff_size);
+int close_client(int fd);
+int socket_receive(char *buff,int buff_size,int sockfd);
+int select_socket(int _timeout, int block);
 char *get_client_ip();
 
 #endif //INTERNETPROJECT_INCLUDE_WRAPPED_SOCKET_H_

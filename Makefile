@@ -40,3 +40,4 @@ $(OBJ_DIR):
 clean:
 	$(RM) $(OBJ) $(BIN) $(SRC_DIR)/lex.yy.c $(SRC_DIR)/y.tab.*
 	$(RM) -r $(OBJ_DIR)
+	$(RM) *.log

@@ -20,9 +20,8 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <sys/fcntl.h>
+#include "constant.h"
 
-#define ECHO_PORT 9999
-#define BUF_SIZE 32768
 
 int main(int argc, char* argv[])
 {
@@ -68,9 +67,9 @@ int main(int argc, char* argv[])
       return 0;
     }
 
-    int readRet = read(fd_in,msg,BUF_SIZE);
+    read(fd_in,msg,BUF_SIZE);
 
-    int bytes_received;
+    size_t bytes_received;
     fprintf(stdout, "Sending %s", msg);
 
     send(sock, msg , strlen(msg), 0);
