@@ -8,6 +8,8 @@
 #include "sys/stat.h"
 #include "../include/error_message.h"
 #include "../include/logger.h"
+#include "../include/util.h"
+#include "../include/cgi.h"
 #include "errno.h"
 
 int process_get(Request * ptr_request,char *response);
@@ -60,6 +62,12 @@ int process_get(Request* ptr_request,char* response){
   }else{
     strcat(path,ptr_request->http_uri);
   }
+  char *cgi_message;
+  if((cgi_message = strstr(path,"?")) != NULL){
+    *cgi_message = '\0';
+    cgi_message++;
+    return invoke_cgi_program(ptr_request,response,path,cgi_message);
+  }
 
   errno = 0;
   FILE *fp = fopen(path,"rb");
@@ -67,7 +75,7 @@ int process_get(Request* ptr_request,char* response){
   if(fp == NULL){
     build_status_line(response,RESPONSE_404);
     build_headers(response, NULL);
-    log_error("error", strerror(errno));
+    log_error(ptr_request,"error", strerror(errno));
     return strlen(response);
   }
 
@@ -95,6 +103,7 @@ int process_get(Request* ptr_request,char* response){
   strcpy(ptr_response_headers->headers[0].content, "text/html");
 
   build_headers(response, ptr_response_headers);
+
 
   free(ptr_response_headers);
 
@@ -124,7 +133,7 @@ int process_head(Request* ptr_request, char* response){
   if(fp == NULL){
     build_status_line(response,RESPONSE_404);
     build_headers(response, NULL);
-    log_error("error", strerror(errno));
+    log_error(ptr_request,"error", strerror(errno));
     return strlen(response);
   }
 
@@ -167,4 +176,6 @@ void build_headers(char* buf,struct Response_headers * headers){
     strcat(buf,headers->headers[i].content);
     strcat(buf,CRLF);
   }
+  strcat(buf,CRLF);
 }
+

@@ -4,6 +4,7 @@
 
 
 #include <sys/socket.h>
+#include "errno.h"
 #include <stdio.h>
 #include <unistd.h>
 #include "stdlib.h"
@@ -11,6 +12,7 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include "wrapped_socket.h"
+#include "../include/util.h"
 #include "constant.h"
 
 int sock;
@@ -49,7 +51,7 @@ int remove_client(int _sock) {
   if (close_socket(clients_fd[_sock])) {
     return 1;
   }
-  clients_fd[_sock] = -1;
+  clients_fd[_sock] = 0;
   client_count--;
   return 0;
 }
@@ -126,7 +128,7 @@ int sock_init() {
 
 int send_byte(char *buffer, int length, int client_fd) {
   if (send(client_fd, buffer, length, 0) != length) {
-    close_socket(client_fd);
+    close_client(client_fd);
     socket_destroy();
     fprintf(stderr, "Error sending to client.\n");
     return EXIT_FAILURE;
@@ -163,7 +165,10 @@ int socket_receive(char *buff, int buff_size, int client_fd) {
   int readret = recv(client_fd, buff, buff_size, 0);
 
   if (readret == -1) {
-    close_socket(client_fd);
+    if(errno == 4) {
+      return -1;
+    }
+    close_client(client_fd);
     socket_destroy();
     fprintf(stderr, "Error reading from client socket.\n");
   }
@@ -172,8 +177,7 @@ int socket_receive(char *buff, int buff_size, int client_fd) {
 }
 
 int close_client(int client_fd) {
-  remove_client(client_fd);
-  if (close_socket(client_fd)) {
+  if (remove_client(client_fd)) {
     socket_destroy();
     fprintf(stderr, "Error closing client socket.\n");
     return EXIT_FAILURE;
@@ -188,7 +192,11 @@ int socket_destroy() {
   return 0;
 }
 
-char *get_client_ip(struct sockaddr_in client_addr) {
-  return inet_ntoa(client_addr.sin_addr);
+char *get_client_ip(int fd) {
+  return inet_ntoa(client_addr[fd].sin_addr);
+}
+
+char *get_client_port(int fd) {
+  return itoa((unsigned)ntohs(client_addr[fd].sin_port));
 }
 

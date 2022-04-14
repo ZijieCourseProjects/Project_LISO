@@ -9,6 +9,6 @@
 int logger_init();
 void logger_stop();
 int log_access(Request *request,int response_code,int response_size);
-int log_error(char* err_level,char* err_message);
+int log_error(Request *request, char* err_level,char* err_message);
 
 #endif //INTERNETPROJECT_INCLUDE_LOGGER_H_

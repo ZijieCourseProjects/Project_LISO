@@ -52,6 +52,7 @@ Request * parse(char *buffer, int size, int socketFd) {
         request->header_count=0;
         //DONE: You will need to handle resizing this in parser.y
         request->headers = (Request_header *) malloc(sizeof(Request_header)*1);
+        request->socket_fd = socketFd;
 		set_parsing_options(buf, i, request);
 
 		if (yyparse() == SUCCESS) {
@@ -62,4 +63,15 @@ Request * parse(char *buffer, int size, int socketFd) {
     printf("Parsing Failed\n");
 	return NULL;
 }
+
+char *get_header_value(Request *request, char *header_name) {
+  int i;
+  for(i=0;i<request->header_count;i++){
+    if(strcmp(request->headers[i].header_name,header_name)==0){
+      return request->headers[i].header_value;
+    }
+  }
+  return NULL;
+}
+
 

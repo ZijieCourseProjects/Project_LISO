@@ -45,11 +45,11 @@ int log_access(Request *request,int response_code,int response_size){
   memset(log,0,128);
   struct tm* now_time = localtime(&timer);
   if(request == NULL){
-    sprintf(log,"%s -- [%d/%d/%d %d:%d:%d] \"%s %s %s\" %d %d\n",get_client_ip(),now_time->tm_mon,now_time->tm_mday,
+    sprintf(log,"%s -- [%d/%d/%d %d:%d:%d] \"%s %s %s\" %d %d\n",get_client_ip(request->socket_fd),now_time->tm_mon,now_time->tm_mday,
             now_time->tm_year+1900,now_time->tm_hour,now_time->tm_min,now_time->tm_sec,
             "BAD REQUEST","","",response_code,response_size);
   }else{
-    sprintf(log,"%s -- [%d/%d/%d %d:%d:%d] \"%s %s %s\" %d %d\n",get_client_ip(),now_time->tm_mon,now_time->tm_mday,
+    sprintf(log,"%s -- [%d/%d/%d %d:%d:%d] \"%s %s %s\" %d %d\n",get_client_ip(request->socket_fd),now_time->tm_mon,now_time->tm_mday,
             now_time->tm_year+1900,now_time->tm_hour,now_time->tm_min,now_time->tm_sec,
             request->http_version,request->http_uri,request->http_method,response_code,response_size);
   }
@@ -61,11 +61,11 @@ int log_access(Request *request,int response_code,int response_size){
   }
 }
 
-int log_error(char* err_level,char* err_message){
+int log_error(Request *request, char* err_level,char* err_message){
   char log[128];
   memset(log,0,128);
   struct tm* now_time = localtime(&timer);
-  sprintf(log,"%s -- [%d/%d/%d %d:%d:%d] [%s] \n%s\n",get_client_ip(),now_time->tm_mon,now_time->tm_mday,
+  sprintf(log,"%s -- [%d/%d/%d %d:%d:%d] [%s] \n%s\n",get_client_ip(request->socket_fd),now_time->tm_mon,now_time->tm_mday,
           now_time->tm_year+1900,now_time->tm_hour,now_time->tm_min,now_time->tm_sec,
           err_level,err_message);
 

@@ -46,6 +46,10 @@ int main(int argc, char *argv[]) {
 
     int fd = select_socket(0,1);
 
+    if(fd == -3){
+      continue;
+    }
+
     if(fd == -1){
       if((fd = socket_accept())  == -1){
         socket_destroy();
@@ -57,14 +61,12 @@ int main(int argc, char *argv[]) {
     readret = socket_receive(buf,BUF_SIZE, fd);
 
     if(readret < 1){
-      socket_destroy();
-      close_socket(fd);
       continue;
     }
 
     char* nextRequest = buf;
     while(1){
-      Request *requst = parse(nextRequest, BUF_SIZE, 0);
+      Request *requst = parse(nextRequest, BUF_SIZE, fd);
       int response_size;
       response_size = process(requst,response);
       switch (response_size) {
@@ -87,13 +89,15 @@ int main(int argc, char *argv[]) {
       }else{
         nextRequest+=4;
         if(*nextRequest == 0 || strcmp(nextRequest,"\r\n")==0){
+          memset(response, 0, BUF_SIZE);
           break;
         }
       }
       memset(response, 0, BUF_SIZE);
     }
-    memset(buf, 0, BUF_SIZE);
 
+    close_client(fd);
+    memset(buf, 0, BUF_SIZE);
   }
   socket_destroy();
 

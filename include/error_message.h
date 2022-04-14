@@ -10,6 +10,7 @@
 #define RESPONSE_404 "404 Not Found"
 #define RESPONSE_501 "501 Not Implemented"
 #define RESPONSE_505 "505 HTTP Version not supported"
+#define RESPONSE_500 "500 Internal Server Error"
 #define HTTP_VERSION "HTTP/1.1"
 #define CRLF "\r\n"
 
